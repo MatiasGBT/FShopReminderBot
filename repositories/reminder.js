@@ -2,7 +2,7 @@ const Connector = require('../connector');
 
 module.exports = class ReminderRepository {
     static createReminder(interaction) {
-        const userId = interaction.client.user.id;
+        const userId = interaction.user.id;
 		const skinName = interaction.options.getString('name') ?? '';
         let conn = Connector.startConnection();
         conn.query(`SELECT * FROM reminders WHERE user_id = '${userId}' AND skin_name = '${skinName}'`, function (error, results, fields) {
