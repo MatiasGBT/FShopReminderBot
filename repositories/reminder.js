@@ -1,18 +1,18 @@
 const Connector = require('../connector');
-const axios = require('axios');
 
 module.exports = class ReminderRepository {
     static createReminder(interaction) {
-        const skinName = interaction.options.getString('name') ?? '';
-        axios.get('https://fortnite-api.com/v2/cosmetics/br/search?name=' + skinName)
-            .then(function (response) {
-                let conn = Connector.startConnection();
-                conn.query(`INSERT INTO reminder (user, skin) VALUES ('${interaction.client.user.id}', '${response.data.data.name}')`);
-                conn.end();
-                interaction.editReply('Reminder created!');
-            })
-            .catch(function (error) {
-                interaction.editReply('Error, the selected skin does not exist');
-            });
+        const userId = interaction.client.user.id;
+		const skinName = interaction.options.getString('name') ?? '';
+        let conn = Connector.startConnection();
+        conn.query(`SELECT * FROM reminders WHERE user_id = '${userId}' AND skin_name = '${skinName}'`, function (error, results, fields) {
+            if (error || results.length > 0) {
+				interaction.editReply('Error, there is already a reminder of this skin for this user');
+            } else {
+                conn.query(`INSERT INTO reminders (user_id, skin_name) VALUES ('${userId}', '${skinName}')`);
+				interaction.editReply('Reminder created!');
+            }
+            conn.end();
+        });
     }
 }
