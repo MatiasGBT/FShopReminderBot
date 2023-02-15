@@ -1,7 +1,8 @@
 const TOKEN = process.env.token;
 const { Client, Collection, GatewayIntentBits, Events } = require("discord.js");
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-const app = require('express');
+const express = require('express');
+const app = express();
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -34,13 +35,20 @@ client.on("ready", () => {
 	console.log("The bot is online");
 });
 
+//#region Express
 //Necessary so that the build in Render does not fail.
 //This is because Render performs a health check by
 //verifying that the application returns a correct
 //status code (between 200 and 399).
+const PORT = process.env.PORT || 3030;
 app.get('/', (req, res) => {
 	res.sendStatus(200)
-})
+});
+
+app.listen(PORT, () => {
+	console.log(`Example app listening on port ${PORT}`)
+});
+//#endregion
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
