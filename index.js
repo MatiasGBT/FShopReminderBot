@@ -1,6 +1,7 @@
 const TOKEN = process.env.token;
 const { Client, Collection, GatewayIntentBits, Events } = require("discord.js");
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const app = require('express');
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -32,6 +33,14 @@ for (const file of commandFiles) {
 client.on("ready", () => {
 	console.log("The bot is online");
 });
+
+//Necessary so that the build in Render does not fail.
+//This is because Render performs a health check by
+//verifying that the application returns a correct
+//status code (between 200 and 399).
+app.get('/', (req, res) => {
+	res.sendStatus(200)
+})
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
