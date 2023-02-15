@@ -92,7 +92,7 @@ function checkReminders(dailyShopItems) {
 //Notifies (sends a private message) to users if a desired skin appeared in the daily shop
 function notifyUsers(results) {
 	results.forEach(reminder => {
-		client.users.send(reminder.user_id, reminder.skin_name + ' is in the daily shop');
+		client.users.send(reminder.user_id, reminder.skin_name + ' is in the daily shop! Date: ' + new Date().toLocaleDateString('en-US'));
 	});
 }
 //#endregion
