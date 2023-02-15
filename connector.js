@@ -1,13 +1,16 @@
-const { dbhost, dbname, dbuser, dbpass } = require('./config.json');
+const DB_HOST = process.env.dbHost;
+const DB_NAME = process.env.dbName;
+const DB_USER = process.env.dbUser;
+const DB_PASS = process.env.dbPass;
 
 module.exports = class Connector {
     static startConnection() {
         var mysql = require('mysql');
         var conn = mysql.createConnection({
-            host: dbhost,
-            database: dbname,
-            user: dbuser,
-            password: dbpass,
+            host: DB_HOST,
+            database: DB_NAME,
+            user: DB_USER,
+            password: DB_PASS,
         });
 
         conn.connect(function (err) {

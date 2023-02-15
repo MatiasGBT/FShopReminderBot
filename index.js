@@ -1,4 +1,4 @@
-const { token } = require('./config.json');
+const TOKEN = process.env.token;
 const { Client, Collection, GatewayIntentBits, Events } = require("discord.js");
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -51,7 +51,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
-client.login(token);
+client.login(TOKEN);
 
 //#region Daily check task
 var cron = require('node-cron');
