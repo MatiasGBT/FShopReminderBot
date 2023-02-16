@@ -46,7 +46,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-	console.log(`Example app listening on port ${PORT}`)
+	console.log(`App listening on port ${PORT}`)
 });
 //#endregion
 
@@ -106,10 +106,18 @@ function checkReminders(dailyShopItems) {
 	conn.end();
 }
 
-//Notifies (sends a private message) to users if a desired skin appeared in the daily shop
+//Notifies (sends a private message) to users if a desired skin appeared in the daily shop.
 function notifyUsers(results) {
 	results.forEach(reminder => {
 		client.users.send(reminder.user_id, reminder.skin_name + ' is in the daily shop! Date: ' + new Date().toLocaleDateString('en-US'));
 	});
 }
+
+//This task sends the endpoint created above an alert every 20 minutes so that the bot does
+//not "sleep" due to the Free Render Plan.
+cron.schedule('*/20 * * * *', () => {
+	axios.get('https://fshopreminder.onrender.com/').then((response) => {
+		console.log("Refreshing")
+	});
+});
 //#endregion
