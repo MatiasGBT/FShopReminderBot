@@ -75,7 +75,7 @@ var cron = require('node-cron');
 const axios = require('axios');
 const Connector = require('./connector');
 
-cron.schedule('0 0 * * *', () => {
+cron.schedule('5 0 * * *', () => {
 	console.log('Checking daily shop');
 	getDailyShopItems();
 });
@@ -115,9 +115,9 @@ function notifyUsers(results) {
 
 //This task sends the endpoint created above an alert every 20 minutes so that the bot does
 //not "sleep" due to the Free Render Plan.
-cron.schedule('*/20 * * * *', () => {
-	axios.get('https://fshopreminder.onrender.com/').then((response) => {
-		console.log("Refreshing")
-	});
+cron.schedule('*/10 * * * *', () => {
+	axios.get('https://fshopreminder.onrender.com/')
+	.then((response) => console.log("Refreshing"))
+	.catch(error => console.log(error));
 });
 //#endregion
