@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { REST, Routes } = require('discord.js');
 const TOKEN = process.env.token;
 const CLIENT_ID = process.env.clientId;
