@@ -10,34 +10,34 @@ module.exports = class Tasks {
         });
 
         async function getDailyShopItems() {
-            axios.get('https://fortnite-api.com/v2/shop/br/combined').then((response) => {
-                //Obtain (and concatenate) the items from the list of daily and featured items.
-                let dailyShopItems = response.data.data.featured.entries.concat(response.data.data.daily.entries);
-                //Bundles are removed to avoid errors
-                dailyShopItems = dailyShopItems.filter(dailyShopItem => dailyShopItem.bundle == null);
-
-                checkReminders(dailyShopItems);
-            });
+            const response = await axios.get('https://fortnite-api.com/v2/shop/br/combined');
+            const dailyShopItems = response.data.data.featured.entries
+                .concat(response.data.data.daily.entries)
+                .filter(dailyShopItem => dailyShopItem.bundle == null);
+            const reminders = await getReminders(dailyShopItems);
+            notifyUsers(reminders);
         }
 
-        //For each of the items in the daily shop, check if any user has saved a reminder for an item.
-        function checkReminders(dailyShopItems) {
+        //For each item in the daily shop, a promise is created if there is a reminder in the database for that item.
+        async function getReminders(dailyShopItems) {
             let conn = Connector.startConnection();
-            dailyShopItems.forEach(entry => {
-                entry.items.forEach(item => {
-                    item.name = item.name.replaceAll('"', '');
+            const promises = dailyShopItems.flatMap(entry => entry.items).map(item => {
+                item.name = item.name.replaceAll('"', '');
+                return new Promise((resolve, reject) => {
                     conn.query(`SELECT * FROM reminders WHERE skin_name = "${item.name}"`, function (error, results, fields) {
-                        if (error) throw error;
-                        if (results.length > 0) notifyUsers(results);
+                        error ? reject(error) : resolve(results);
                     });
                 });
             });
             conn.end();
+            //Promise.all() avoids having to use a for loop for each item in the shop, executing all queries at once and improving performance.
+            const results = await Promise.all(promises);
+            return results.flat().filter(Boolean);
         }
 
         //Notifies (sends a private message) to users if a desired skin appeared in the daily shop.
-        function notifyUsers(results) {
-            results.forEach(reminder => {
+        function notifyUsers(reminders) {
+            reminders.forEach(reminder => {
                 client.users.send(reminder.user_id, reminder.skin_name + ' is in the daily shop! Date: ' + new Date().toLocaleDateString('en-US'));
             });
         }
